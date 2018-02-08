@@ -1,30 +1,33 @@
 import numpy as np
 from match import Match
-import json
 
 class Tournament:
-    def __init__(self, teams=None):
-        with open('data.txt') as f:
-            data = json.load(f)
-
+    def __init__(self, data, teams=None, default_team=None):
         if teams is None:
             teams = data['Teams']
             
+        self.data = data
+        
         self.scores = {}
         
         self.teams = list(teams)
+        # if there is a default team remove a random team and include this
+        if default_team!=None:
+            r = np.random.randint(8)
+            self.teams[r] = default_team
         np.random.shuffle(self.teams)
-        self.init()
         
-    def init(self):
-        self.q1 = Match(self.teams[0], self.teams[1])
-        self.q2 = Match(self.teams[2], self.teams[3])
-        self.q3 = Match(self.teams[4], self.teams[5])
-        self.q4 = Match(self.teams[6], self.teams[7])
+        self.init(data)
         
-        self.s1 = Match()
-        self.s2 = Match()
-        self.final = Match()
+    def init(self, data):
+        self.q1 = Match(data, self.teams[0], self.teams[1])
+        self.q2 = Match(data, self.teams[2], self.teams[3])
+        self.q3 = Match(data, self.teams[4], self.teams[5])
+        self.q4 = Match(data, self.teams[6], self.teams[7])
+        
+        self.s1 = Match(data)
+        self.s2 = Match(data)
+        self.final = Match(data)
         
     def get_mots(self):
         maxn = None
@@ -61,16 +64,17 @@ class Tournament:
         self.print_fixture()
         ts1 = self.play_match( self.q1 )
         ts2 = self.play_match( self.q2 )
-        self.s1.init(ts1,ts2)
+        self.s1.init(self.data, ts1,ts2)
+        
         ts3 = self.play_match( self.q3 )
         ts4 = self.play_match( self.q4 )
-        self.s2.init(ts3,ts4)
+        self.s2.init(self.data, ts3,ts4)
             
         print('\n____ Semifinals...')
         self.print_fixture()
         tf1 = self.play_match( self.s1 )
         tf2 = self.play_match( self.s2 )
-        self.final.init(tf1, tf2)
+        self.final.init(self.data, tf1, tf2)
             
         print('\n____ Finals...')
         self.print_fixture()

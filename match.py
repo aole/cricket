@@ -1,20 +1,17 @@
 import numpy as np
 import json
 
-with open('data.txt') as f:
-    data = json.load(f)
-    
 result_type = ['Wk','0', '1', '2', '3', '4', '6']
 result_prob = [6,   35,  39,  18,  4,   13,   5]
 result_prob = result_prob/np.sum(result_prob) # sum up to 1
 
 class Match:
-    def __init__(self, teama=None, teamb=None):
+    def __init__(self, data, teama=None, teamb=None):
         self.complete = False
         self.winner = None
-        self.init(teama, teamb)
+        self.init(data, teama, teamb)
         
-    def init( self, teama, teamb ):
+    def init( self, data, teama, teamb ):
         if teama==None or teamb==None:
             return
             

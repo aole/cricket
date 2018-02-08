@@ -2,10 +2,13 @@ import numpy as np
 from match import Match
 from tournament import Tournament
 import json
+import names
 
 with open('data.txt') as f:
     data = json.load(f)
     teams = data['Teams']
+
+default_team = None
     
 def cmd_teams(arg):
     idx=0
@@ -17,11 +20,11 @@ def cmd_match(arg):
     args = arg.split()
     teama = teams[int(args[1])-1]
     teamb = teams[int(args[2])-1]
-    m = Match( teama, teamb )
+    m = Match( data, teama, teamb )
     m.play()
     
 def cmd_tournament(arg):
-    t = Tournament()
+    t = Tournament(data, default_team=default_team)
     t.play()
     
 def cmd_help(arg):
@@ -29,7 +32,25 @@ def cmd_help(arg):
     for k in commands.keys():
         print(k)
         
-commands = { 'teams':cmd_teams, 'match':cmd_match, 'tournament':cmd_tournament, 'help':cmd_help }
+def cmd_create(arg):
+    '''
+    Create a team.
+    11 random players will be added.
+    this will become the default team of the Coach.
+    '''
+    tname = arg.split()[1]
+    teams.append(tname)
+    default_team = tname
+    
+    print('Team', tname+':')
+    players=[]
+    for i in range(11):
+        name = names.get_full_name(gender='male')
+        players.append(name)
+        print(name)
+    data[tname]=players
+    
+commands = { 'teams':cmd_teams, 'match':cmd_match, 'tournament':cmd_tournament, 'help':cmd_help, 'create':cmd_create }
 
 while True:
     print('cmd>',end=' ')
