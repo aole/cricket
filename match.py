@@ -6,12 +6,12 @@ result_prob = [6,   35,  39,  18,  4,   13,   5]
 result_prob = result_prob/np.sum(result_prob) # sum up to 1
 
 class Match:
-    def __init__(self, data, teama=None, teamb=None):
+    def __init__(self, teama=None, teamb=None):
         self.complete = False
         self.winner = None
-        self.init(data, teama, teamb)
+        self.init(teama, teamb)
         
-    def init( self, data, teama, teamb ):
+    def init( self, teama, teamb ):
         if teama==None or teamb==None:
             return
             
@@ -22,27 +22,26 @@ class Match:
         if coin==1:
             self.team1, self.team2 = self.team2, self.team1
         
-        self.batsmen1 = data[self.team1]
-        assert len(self.batsmen1)>10
-        self.batsmen2 = data[self.team2]
-        assert len(self.batsmen2)>10
+    def record( over, ball, batsman, bowler, out=False):
+        pass
         
     def play( self ):
-        print('Match between', self.team1, 'and', self.team2)
+        print( 'Match between', self.team1.name, 'and', self.team2.name )
         
         self.score = [0,0]
         self.wickets = [0,0]
         
         team1_balls = []
-        batsmen1_score = { self.batsmen1[0]:[], self.batsmen1[1]:[] }
-        batsman_facing = self.batsmen1[0]
-        batsman_doubling = self.batsmen1[1]
-        next_batsman_index = 2
+        batsmen1_score = { self.team1.get_batsman(1):[], self.team1.get_batsman(2):[] }
+        batsman_facing = self.team1.get_batsman(1)
+        batsman_doubling = self.team1.get_batsman(2)
+        next_batsman_index = 3
         
         # first inings
-        print(self.team1, 'innings...')
-        for o in range(20):
-            for b in range(6):
+        print(self.team1.name, 'innings...')
+        for over in range(20):
+            bowler = self.team1.get_bowler(over+1)
+            for ball in range(1,7):
                 r = np.random.choice(result_type, p=result_prob)
                 team1_balls.append(r)
                 
@@ -51,8 +50,8 @@ class Match:
                     if self.wickets[0] > 9:
                         break
                     batsmen1_score[batsman_facing].append(0) # wicket is also a ball faced
-                    batsmen1_score[self.batsmen1[next_batsman_index]] = []
-                    batsman_facing = self.batsmen1[next_batsman_index]
+                    batsmen1_score[self.team1.get_batsman(next_batsman_index)] = []
+                    batsman_facing = self.team1.get_batsman(next_batsman_index)
                     next_batsman_index += 1
                 else:
                     r = int(r)
@@ -72,22 +71,23 @@ class Match:
         
         self.batsmen1_score = batsmen1_score
         # print(batsmen1_score)
-        for i in range(next_batsman_index):
-            print('   '+self.batsmen1[i]+'\t'+str(sum(batsmen1_score[self.batsmen1[i]]))+' ('+str(len(batsmen1_score[self.batsmen1[i]]))+')')
+        for i in range(1, next_batsman_index):
+            p = self.team1.get_batsman(i)
+            print('   '+p+'\t'+str(sum(batsmen1_score[p]))+' ('+str(len(batsmen1_score[p]))+')')
             
-        print('  '+self.team1, 'scored', str(self.score[0])+'/'+str(self.wickets[0]), 'in '+str(o if b<5 else o+1)+'.'+str((b+1 if b<5 else '')))
+        print('  '+self.team1.name, 'scored', str(self.score[0])+'/'+str(self.wickets[0]), 'in '+str(over if ball<6 else over+1)+'.'+str((ball if ball<6 else '')))
         # print(team1_balls)
         
         # second inings
         team2_balls = []
-        batsmen2_score = { self.batsmen2[0]:[], self.batsmen2[1]:[] }
-        batsman_facing = self.batsmen2[0]
-        batsman_doubling = self.batsmen2[1]
-        next_batsman_index = 2
+        batsmen2_score = { self.team2.get_batsman(1):[], self.team2.get_batsman(2):[] }
+        batsman_facing = self.team2.get_batsman(1)
+        batsman_doubling = self.team2.get_batsman(2)
+        next_batsman_index = 3
         
-        print(self.team2, 'innings...')
-        for o in range(20):
-            for b in range(6):
+        print(self.team2.name, 'innings...')
+        for over in range(20):
+            for ball in range(1,7):
                 r = np.random.choice(result_type, p=result_prob)
                 team2_balls.append(r)
                 
@@ -96,8 +96,8 @@ class Match:
                     if self.wickets[1] > 9:
                         break
                     batsmen2_score[batsman_facing].append(0)
-                    batsmen2_score[self.batsmen2[next_batsman_index]] = []
-                    batsman_facing = self.batsmen2[next_batsman_index]
+                    batsmen2_score[self.team2.get_batsman(next_batsman_index)] = []
+                    batsman_facing = self.team2.get_batsman(next_batsman_index)
                     next_batsman_index += 1
                 else:
                     r = int(r)
@@ -121,21 +121,22 @@ class Match:
             batsman_facing, batsman_doubling = batsman_doubling, batsman_facing
         
         self.batsmen2_score = batsmen2_score
-        for i in range(next_batsman_index):
-            print('   '+self.batsmen2[i]+'\t'+str(sum(batsmen2_score[self.batsmen2[i]]))+' ('+str(len(batsmen2_score[self.batsmen2[i]]))+')')
+        for i in range(1, next_batsman_index):
+            p = self.team2.get_batsman(i)
+            print('   '+p+'\t'+str(sum(batsmen2_score[p]))+' ('+str(len(batsmen2_score[p]))+')')
             
-        print('  '+self.team2, 'scored', str(self.score[1])+'/'+str(self.wickets[1]), 'in '+str(o if b<5 else o+1)+'.'+str((b+1 if b<5 else '')))
+        print('  '+self.team2.name, 'scored', str(self.score[1])+'/'+str(self.wickets[1]), 'in '+str(over if ball<6 else over+1)+'.'+str((ball if ball<6 else '')))
         # print(team2_balls)
         
         # result
         self.complete = True
         if self.score[0] > self.score[1]:
-            print ('  '+self.team1, 'beat', self.team2, 'by', str(self.score[0]-self.score[1]),'runs!')
+            print ('  '+self.team1.name, 'beat', self.team2.name, 'by', str(self.score[0]-self.score[1]),'runs!')
             self.winner = self.team1
         # elif self.score[1] > self.score[0]:
         # TODO: Handle ties
         else:
-            print ('  '+self.team2, 'beat', self.team1, 'by', str(10-self.wickets[1]),'wickets!')
+            print ('  '+self.team2.name, 'beat', self.team1.name, 'by', str(10-self.wickets[1]),'wickets!')
             self.winner = self.team2
             
         # man of the match
