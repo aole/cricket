@@ -41,17 +41,16 @@ class Tournament:
                 
         return team, maxn, maxs
         
-    def collect_score(self, team, scores):
+    def collect_score(self, scores):
         for n,s in scores.items():
             if n not in self.scores:
-                self.scores[n] = {'team':team,'score':[]}
-            self.scores[n]['score'].extend(s)
+                self.scores[n] = {'team':s['team'],'score':[]}
+            self.scores[n]['score'].extend(s['runs'])
             
     def play_match(self, match):
         winner = match.play()
         
-        self.collect_score( match.team1, match.batsmen1_score )
-        self.collect_score( match.team2, match.batsmen2_score )
+        self.collect_score( match.batsman_score )
         
         return winner
         
