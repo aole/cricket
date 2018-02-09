@@ -186,10 +186,10 @@ class Match:
                 maxn = n
                 maxs = r
                 maxb = bl
-            elif r==maxs and b<maxb:
+            elif r==maxs and bl<maxb:
                 maxn = n
-                maxs = s
-                maxb = b
+                maxs = r
+                maxb = bl
                 
         return maxn, maxs, maxb
         
