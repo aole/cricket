@@ -10,6 +10,7 @@ class Match:
         self.complete = False
         self.winner = None
         self.batsman_score = {}
+        self.bowler_score = {}
         self.init(teama, teamb)
         
     def init( self, teama, teamb ):
@@ -25,11 +26,16 @@ class Match:
         
     def record( self, over, ball, runs, batsman, bowler, out=False):
         assert batsman in self.batsman_score, batsman
+        assert bowler in self.bowler_score, bowler
         
         self.batsman_score[batsman]['runs'].append( runs )
+        self.bowler_score[bowler]['runs'].append( runs )
         if out:
             self.batsman_score[batsman]['out'] = True
             self.batsman_score[batsman]['bowler'] = bowler
+            self.bowler_score[bowler]['wickets'].append( batsman )
+        else:
+            self.bowler_score[bowler]['wickets'].append( '' )
         
     def get_batsman_score( self, batsman ):
         assert batsman in self.batsman_score
@@ -59,7 +65,9 @@ class Match:
         for over in range(20):
             
             bowler = self.team2.get_bowler(over+1)
-            
+            if bowler not in self.bowler_score:
+                self.bowler_score[bowler] = {'team':self.team2, 'runs':[], 'wickets':[]}
+                
             for ball in range(1,7):
                 r = np.random.choice(result_type, p=result_prob)
                 
@@ -99,7 +107,24 @@ class Match:
             assert bsr!=None, str(i)+':'+p+':'+str(self.batsman_score)
             print( '   '+str(i)+'. '+p+'\t'+bsbw+'\t'+str(bsr)+' ('+str(bsb)+')' )
         
+        print()
+        
+        for bowler, score in self.bowler_score.items():
+            if score['team']==self.team1:
+                continue
+            bls = len(score['runs'])
+            bo = bls//6
+            bb = bls%6
+            runs = sum(score['runs'])
+            wkts = np.count_nonzero(score['wickets'])
+            
+            print( '   '+bowler+'\t'+str(bo)+'.'+str(bb)+' - '+str(runs)+' - '+str(wkts) )
+            
+        print()
+        
         print('  '+self.team1.name, 'scored', str(self.score[0])+'/'+str(self.wickets[0]), 'in '+str(over if ball<6 else over+1)+'.'+str((ball if ball<6 else '')))
+        
+        print()
         
         # second inings
         batsman_facing = self.team2.get_batsman(1)
@@ -113,6 +138,8 @@ class Match:
         for over in range(20):
             
             bowler = self.team1.get_bowler(over+1)
+            if bowler not in self.bowler_score:
+                self.bowler_score[bowler] = {'team':self.team1, 'runs':[], 'wickets':[]}
             
             for ball in range(1,7):
                 r = np.random.choice(result_type, p=result_prob)
@@ -157,6 +184,21 @@ class Match:
             assert bsr!=None, str(i)+':'+p+':'+str(self.batsman_score)
             print( '   '+str(i)+'. '+p+'\t'+bsbw+'\t'+str(bsr)+' ('+str(bsb)+')' )
         
+        print()
+        
+        for bowler, score in self.bowler_score.items():
+            if score['team']==self.team2:
+                continue
+            bls = len(score['runs'])
+            bo = bls//6
+            bb = bls%6
+            runs = sum(score['runs'])
+            wkts = np.count_nonzero(score['wickets'])
+            
+            print( '   '+bowler+'\t'+str(bo)+'.'+str(bb)+' - '+str(runs)+' - '+str(wkts) )
+            
+        print()
+        
         print('  '+self.team2.name, 'scored', str(self.score[1])+'/'+str(self.wickets[1]), 'in '+str(over if ball<6 else over+1)+'.'+str((ball if ball<6 else '')))
         
         # result
@@ -173,6 +215,8 @@ class Match:
         # man of the match
         mm, mms, mmb = self.get_motm()
         print('  Man of the Match: '+mm+'\t'+str(mms)+' ('+str(mmb)+')')
+        
+        print()
         
         return self.winner
 
