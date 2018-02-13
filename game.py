@@ -88,6 +88,7 @@ last_tournament = None
 
 while True:
     play_tournament()
+    #play_match()
     print('cmd>',end=' ')
     cmd = input()
     if cmd=='quit' or cmd=='exit':

@@ -15,6 +15,7 @@ class Match:
         self.winner = None
         self.batsman_score = {}
         self.bowler_score = {}
+        self.partnerships = {}
         
         global matchid
         self.id = matchid
@@ -55,6 +56,10 @@ class Match:
         
         self.batsman_score[batsman]['runs'].append( runs )
         self.bowler_score[bowler]['runs'].append( runs )
+        
+        part = min(batsman, doubling)+','+max(batsman, doubling)
+        self.partnerships[part].append( runs )
+            
         if out:
             self.batsman_score[batsman]['out'] = True
             self.batsman_score[batsman]['bowler'] = bowler
@@ -103,6 +108,14 @@ class Match:
             
             print()
         
+        maxs=[]
+        maxp=None
+        for k,v in self.partnerships.items():
+            if sum(v)>sum(maxs):
+                maxs = v
+                maxp = k
+        print( '  Best Partnership: '+ maxp+'\t'+ str(sum(maxs))+' ('+str(len(maxs))+')' )
+        
         print('  Man of the Match: '+self.mom[0]+'\t'+self.mom[1]+' ('+self.mom[2]+')')
         
         print ('  '+self.__str__())
@@ -123,6 +136,9 @@ class Match:
             self.batsman_score[batsman_facing]={'team':teambt, 'runs':[],'out':False, 'bowler':None}
             self.batsman_score[batsman_doubling]={'team':teambt, 'runs':[],'out':False, 'bowler':None}
             
+            part = min(batsman_facing, batsman_doubling)+','+max(batsman_facing, batsman_doubling)
+            self.partnerships[part]=[]
+            
             for over in range(20):
                 
                 bowler = teambl.get_bowler(over+1)
@@ -142,6 +158,10 @@ class Match:
                             
                         batsman_facing = teambt.get_batsman(next_batsman_index)
                         self.batsman_score[batsman_facing] = {'team':teambt, 'runs':[],'out':False, 'bowler':None}
+                        
+                        # new partnership
+                        part = min(batsman_facing, batsman_doubling)+','+max(batsman_facing, batsman_doubling)
+                        self.partnerships[part]=[]
                         
                         next_batsman_index += 1
                         
@@ -172,7 +192,6 @@ class Match:
             teambt.balls = ball if ball<6 else 0
         
         # result
-        
         self.complete = True
         if self.team1.score>self.team2.score:
             self.winner = self.team1
@@ -191,11 +210,16 @@ class Match:
         mm, mms, mmb = self.get_motm()
         self.mom = (mm, str(mms), str(mmb))
         
+        self.check_global_records()
+        
         if verbose:
             self.print_scoreboard()
         
         return self.winner
 
+    def check_global_records(self):
+        pass
+        
     def get_motm(self):
         maxn = None
         maxs = 0
