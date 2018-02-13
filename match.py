@@ -1,6 +1,7 @@
 import numpy as np
 import json
 from copy import deepcopy
+from team import Team
 
 result_type = ['Wk','0', '1', '2', '3', '4', '6']
 result_prob = [6,   35,  39,  18,  4,   13,   5]
@@ -122,7 +123,20 @@ class Match:
         
         print()
         
-    def play( self, verbose=True ):
+    def summary( self ):
+        assert self.complete, self
+        
+        s = '#'+str(self.id)+' '+self.winner.name+' ('+str(self.winner.score)+'/'+str(self.winner.wickets)+') beat '+ self.looser.name+' ('+str(self.looser.score)+'/'+str(self.looser.wickets)+')  by '
+        if self.by_runs:
+            s += str(self.by_runs)+' runs!\n'
+        else:
+            s += str(self.by_wickets)+' wickets!\n'
+        
+        s += '  Man of the Match: '+self.mom[0]+'\t'+self.mom[1]+' ('+self.mom[2]+')'
+        
+        return s
+    
+    def play( self, verbose=False ):
         self.team1.score = self.team2.score = None
         
         for teambt, teambl in [[self.team1, self.team2],[self.team2, self.team1]]:
@@ -237,3 +251,14 @@ class Match:
                 
         return maxn, maxs, maxb
         
+if __name__ == '__main__':
+    with open('data.txt') as f:
+        data = json.load(f)
+        teams = []
+        for team in data['Teams']:
+            teams.append( Team(team, data=data) )
+            
+    m = Match( teams[0], teams[2] )
+    m.play()
+    print(m.summary())
+    

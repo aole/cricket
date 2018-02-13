@@ -44,4 +44,13 @@ class Team:
         
     def __repr__( self ):
         return self.__str__()
+    
+    def __hash__( self ):
+        return hash( self.name )
+    
+    def __eq__( self, other ):
+        return isinstance(other, Team) and self.name == other.name
+        
+    def __ne__( self, other ):
+        return not( self == other )
         

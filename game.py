@@ -25,8 +25,8 @@ def play_match(teama=None, teamb=None):
     
     return m
     
-def play_tournament():
-    t = Tournament( teams, default_team=default_team )
+def play_tournament(type=Tournament.KO8):
+    t = Tournament( teams, default_team=default_team, type=type )
     t.play()
     
     global last_tournament, last_match
@@ -77,7 +77,6 @@ def print_team(team=None):
 
 with open('data.txt') as f:
     data = json.load(f)
-    # teams = data['Teams']
     teams = []
     for team in data['Teams']:
         teams.append( Team(team, data=data) )
@@ -87,7 +86,7 @@ last_match = None
 last_tournament = None
 
 while True:
-    play_tournament()
+    play_tournament(Tournament.BIG8)
     #play_match()
     print('cmd>',end=' ')
     cmd = input()
