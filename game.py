@@ -23,6 +23,8 @@ def play_match(teama=None, teamb=None):
     global last_match
     last_match = m
     
+    return m
+    
 def play_tournament():
     t = Tournament( teams, default_team=default_team )
     t.play()
@@ -30,6 +32,8 @@ def play_tournament():
     global last_tournament, last_match
     last_tournament = t
     last_match = t.final
+    
+    return t
     
 def create_team( team ):
     '''
@@ -83,6 +87,7 @@ last_match = None
 last_tournament = None
 
 while True:
+    play_tournament()
     print('cmd>',end=' ')
     cmd = input()
     if cmd=='quit' or cmd=='exit':

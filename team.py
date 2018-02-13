@@ -32,13 +32,15 @@ class Team:
         self.players.insert(pos-1, name)
     
     def __str__( self ):
+        '''
         s = self.name+'\n'
         s += '----\n'
         cnt=1
         for p in self.players:
             s += str(cnt)+'. '+p+'\n'
             cnt+=1
-        return s
+        '''
+        return self.name
         
     def __repr__( self ):
         return self.__str__()

@@ -2,10 +2,14 @@ import numpy as np
 from match import Match
 
 class Tournament:
-    def __init__(self, teams, default_team=None):
+    KO8 = 1
+    BIG8 = 2
+    
+    def __init__(self, teams, default_team=None, type=KO8):
         self.scores = {}
         
         self.teams = list(teams)
+        
         # if there is a default team remove a random team and include this
         if default_team!=None:
             r = np.random.randint(8)
